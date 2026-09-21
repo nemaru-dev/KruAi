@@ -13,13 +13,12 @@
         :root {
             --primary: #6c5ce7; --secondary: #a29bfe; --bg: #f0f2f5;
             --card-bg: #ffffff; --text-main: #2d3436; --accent: #00cec9;
-            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --shadow: 0 4px 15px rgba(0,0,0,0.08); --danger: #ff7675;
         }
 
         * { box-sizing: border-box; font-family: 'Mitr', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding: 10px; min-height: 100vh; overflow-x: hidden; }
-        
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding: 10px; min-height: 100vh; }
         .container { max-width: 1000px; margin: auto; }
 
         /* Login UI */
@@ -29,8 +28,7 @@
         }
         .btn-google { 
             background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-            color: white; border: none; padding: 15px 30px; border-radius: 50px; 
-            font-size: 1rem; cursor: pointer; width: 100%; max-width: 280px;
+            color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; width: 100%; max-width: 280px;
         }
 
         /* Header */
@@ -52,34 +50,21 @@
         .label { font-size: 0.8rem; color: var(--primary); font-weight: 500; margin-bottom: 8px; display: block; }
         
         .input-group { display: flex; flex-direction: column; gap: 10px; }
-        input, select { 
-            width: 100%; padding: 12px; border-radius: 12px; 
-            border: 1px solid #ddd; background: #fff; font-size: 1rem;
-        }
+        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; background: #fff; }
 
-        button { 
-            padding: 12px; border-radius: 12px; border: none; 
-            font-weight: 500; cursor: pointer; font-size: 1rem;
-        }
+        button { padding: 12px; border-radius: 12px; border: none; font-weight: 500; cursor: pointer; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-accent { background: var(--accent); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
 
         /* Search Results (Horizontal Scroll) */
-        .search-results { 
-            display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; 
-            -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
-        }
-        .result-card { 
-            min-width: 160px; width: 160px; background: white; padding: 8px; 
-            border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); scroll-snap-align: start;
-        }
+        .search-results { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; }
+        .result-card { min-width: 160px; width: 160px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .result-card img { width: 100%; border-radius: 10px; }
-        .result-title { font-size: 0.7rem; height: 32px; overflow: hidden; margin: 5px 0; line-height: 1.2; }
+        .result-title { font-size: 0.7rem; height: 32px; overflow: hidden; margin: 5px 0; }
 
         /* Video Grid */
-        .video-grid { 
-            display: grid; grid-template-columns: 1fr; gap: 15px; 
-        }
+        .video-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .video-card { background: white; padding: 10px; border-radius: 20px; box-shadow: var(--shadow); }
         .iframe-wrap { position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; background: #000; }
         .iframe-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
@@ -87,22 +72,23 @@
         .card-actions { display: flex; justify-content: space-around; padding-top: 10px; }
         .tool-btn { background: #f0f2f5; border: none; padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); padding: 20px; align-items: center; justify-content: center; }
+        /* Modals */
+        .modal { 
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; 
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
+            padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(3px);
+        }
         .modal-content { 
             background: white; padding: 25px; border-radius: 25px; 
-            width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
+        .modal-icon { font-size: 3rem; margin-bottom: 10px; }
 
         #mainApp, .hidden { display: none; }
 
-        /* Desktop Adjustments */
         @media (min-width: 600px) {
-            body { padding: 20px; }
             .input-group { flex-direction: row; }
             .video-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-            .btn-google { width: auto; }
-            .modal { display: none; } /* Reset flex for JS control */
         }
     </style>
 </head>
@@ -113,38 +99,34 @@
     <div id="loginPage" class="login-box">
         <div style="font-size: 3rem; margin-bottom: 10px;">✨</div>
         <h2 style="color: var(--primary); margin: 0;">Knowledge Collector</h2>
-        <p style="margin-bottom: 30px; color: #7f8c8d; font-size: 0.9rem;">บันทึกความรู้จากทั่วโลกไว้ในที่เดียว</p>
+        <p style="margin-bottom: 30px; color: #7f8c8d;">บันทึกความรู้จาก YouTube ไว้ในคลังส่วนตัว</p>
         <button class="btn-google" onclick="login()">🚀 เข้าสู่ระบบด้วย Google</button>
     </div>
 
-    <!-- หน้าหลัก -->
     <div id="mainApp">
         <div class="header">
-            <div class="user-info">
-                <img id="userImg" src="">
-                <b id="userName"></b>
-            </div>
+            <div class="user-info"><img id="userImg" src=""> <b id="userName"></b></div>
             <button onclick="auth.signOut()" style="background:none; border:none; color:#95a5a6; font-size:0.8rem;">Logout</button>
         </div>
 
         <!-- ค้นหา -->
         <div class="search-section">
-            <span class="label">🔍 ค้นหาความรู้จาก YouTube</span>
+            <span class="label">🔍 ค้นหาความรู้ใหม่</span>
             <div class="input-group">
-                <input type="text" id="searchQuery" placeholder="พิมพ์เนื้อหาที่อยากค้นหา...">
+                <input type="text" id="searchQuery" placeholder="พิมพ์สิ่งที่คุณอยากเรียนรู้...">
                 <button class="btn-accent" onclick="searchYouTube()">ค้นหา</button>
             </div>
             <div id="searchResults" class="search-results">
-                <p style="color:#bdc3c7; font-size:0.8rem; padding: 10px;">ผลการค้นหาจะปรากฏที่นี่...</p>
+                <p style="color:#bdc3c7; font-size:0.8rem; padding: 10px;">ผลการค้นหาจะแสดงที่นี่...</p>
             </div>
         </div>
 
         <!-- จัดการหมวดหมู่ -->
         <div class="admin-panel">
-            <span class="label">📚 สร้างหมวดหมู่การเรียนรู้</span>
+            <span class="label">📚 สร้างหมวดหมู่</span>
             <div class="input-group">
                 <select id="parentCatSelect"><option value="none">-- เป็นหมวดหลัก --</option></select>
-                <input type="text" id="catInput" placeholder="ชื่อหมวดหมู่ใหม่...">
+                <input type="text" id="catInput" placeholder="ชื่อหมวดหมู่...">
                 <button class="btn-primary" onclick="addCategory()">+ สร้าง</button>
             </div>
         </div>
@@ -156,7 +138,6 @@
             </select>
         </div>
 
-        <!-- แสดงวิดีโอ -->
         <div id="videoDisplay" class="video-grid"></div>
     </div>
 </div>
@@ -164,8 +145,9 @@
 <!-- Modal เลือกหมวดบันทึก -->
 <div id="saveModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); margin-top: 0;">บันทึกลงคลัง ✨</h3>
-        <p style="font-size: 0.8rem; color: #7f8c8d;">เลือกหมวดหมู่ที่ต้องการเก็บ</p>
+        <div class="modal-icon">📥</div>
+        <h3 style="color: var(--primary); margin: 0;">บันทึกลงคลัง</h3>
+        <p style="font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px;">เลือกหมวดหมู่ที่ต้องการเก็บ</p>
         <select id="modalCatSelect" style="margin-bottom: 20px;"></select>
         <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="executeQuickSave()">ตกลง</button>
         <button onclick="closeModal('saveModal')" style="width: 100%; background: #eee; border-radius: 12px;">ยกเลิก</button>
@@ -175,10 +157,23 @@
 <!-- Modal ย้ายหมวด -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); margin-top: 0;">ย้ายหมวดหมู่ 💡</h3>
+        <div class="modal-icon">💡</div>
+        <h3 style="color: var(--primary); margin: 0;">ย้ายหมวดหมู่</h3>
+        <p style="font-size: 0.8rem; color: #7f8c8d; margin-bottom: 20px;">เลือกหมวดหมู่ใหม่สำหรับวิดีโอนี้</p>
         <select id="editCatSelect" style="margin-bottom: 20px;"></select>
         <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="saveEdit()">บันทึก</button>
         <button onclick="closeModal('editModal')" style="width: 100%; background: #eee; border-radius: 12px;">ยกเลิก</button>
+    </div>
+</div>
+
+<!-- Modal คอนเฟิร์มการลบ (New!) -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-icon">🗑️</div>
+        <h3 style="color: var(--danger); margin: 0;">ยืนยันการลบ?</h3>
+        <p style="font-size: 0.85rem; color: #7f8c8d; margin: 15px 0 25px;">คุณแน่ใจหรือไม่ว่าต้องการลบวิดีโอนี้ออกจากคลังความรู้ของคุณ?</p>
+        <button class="btn-danger" style="width: 100%; margin-bottom: 10px;" id="confirmDeleteBtn">ใช่, ลบเลย</button>
+        <button onclick="closeModal('deleteModal')" style="width: 100%; background: #eee; border-radius: 12px; padding:12px;">ยกเลิก</button>
     </div>
 </div>
 
@@ -201,6 +196,7 @@
     let currentUser = null;
     let myData = { categories: {}, videos: {} };
     let editingVideoKey = null;
+    let deletingVideoKey = null; // สำหรับการลบ
     let pendingVideoId = null;
 
     function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
@@ -227,10 +223,9 @@
         const query = document.getElementById('searchQuery').value.trim();
         if (!query) return;
         const resultsArea = document.getElementById('searchResults');
-        resultsArea.innerHTML = "<p style='padding:10px;'>กำลังค้นหา...</p>";
+        resultsArea.innerHTML = "กำลังค้นหา...";
         try {
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YT_API_KEY}`;
-            const res = await fetch(url);
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${encodeURIComponent(query)}&type=video&key=${YT_API_KEY}`);
             const data = await res.json();
             resultsArea.innerHTML = "";
             data.items.forEach(item => {
@@ -260,6 +255,22 @@
         }).then(() => { closeModal('saveModal'); });
     }
 
+    // --- ส่วนของการลบแบบใหม่ ---
+    function openDeleteModal(key) {
+        deletingVideoKey = key;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        if (deletingVideoKey) {
+            db.ref('users/' + currentUser.uid + '/videos/' + deletingVideoKey).remove()
+            .then(() => {
+                closeModal('deleteModal');
+                deletingVideoKey = null;
+            });
+        }
+    };
+
     function addCategory() {
         const name = document.getElementById('catInput').value.trim();
         const parentId = document.getElementById('parentCatSelect').value;
@@ -282,10 +293,6 @@
     function saveEdit() {
         const newCatId = document.getElementById('editCatSelect').value;
         db.ref('users/' + currentUser.uid + '/videos/' + editingVideoKey).update({ catId: newCatId }).then(() => closeModal('editModal'));
-    }
-
-    function deleteVideo(key) {
-        if(confirm('ลบวิดีโอ?')) db.ref('users/' + currentUser.uid + '/videos/' + key).remove();
     }
 
     function generateCategoryOptions() {
@@ -333,11 +340,10 @@
             card.innerHTML = `<div class="iframe-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${v.youtubeId}?modestbranding=1&rel=0" allowfullscreen></iframe></div>
                 <div class="card-actions">
                     <button class="tool-btn" onclick="openEditModal('${key}', '${v.catId}')" style="color:var(--primary);">✎ ย้าย</button>
-                    <button class="tool-btn" onclick="deleteVideo('${key}')" style="color:#ff7675;">✖ ลบ</button>
+                    <button class="tool-btn" onclick="openDeleteModal('${key}')" style="color:var(--danger);">✖ ลบ</button>
                 </div>`;
             display.appendChild(card);
         });
-        if (display.innerHTML === '') display.innerHTML = '<p style="text-align:center; color:#bdc3c7; padding:20px;">ไม่มีวิดีโอ ✨</p>';
     }
 </script>
 </body>
