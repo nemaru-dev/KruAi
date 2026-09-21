@@ -3,145 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowledge Collector ✨ | คลังความรู้ส่วนตัว</title>
+    <title>Knowledge Collector ✨ | Smart Search</title>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <style>
         :root {
-            --primary: #6c5ce7; /* ปรับเป็นสีม่วงอ่อน ให้ความรู้สึกสร้างสรรค์ */
-            --secondary: #a29bfe;
-            --bg: #f8f9fe;
-            --card-bg: #ffffff;
-            --text-main: #2d3436;
-            --accent: #00cec9;
+            --primary: #6c5ce7; --secondary: #a29bfe; --bg: #f8f9fe;
+            --card-bg: #ffffff; --text-main: #2d3436; --accent: #00cec9;
             --shadow: 0 15px 35px rgba(108, 92, 231, 0.12);
         }
-
         * { box-sizing: border-box; font-family: 'Mitr', sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; min-height: 100vh; }
-        .container { max-width: 950px; margin: auto; }
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; min-height: 100vh; }
+        .container { max-width: 1000px; margin: auto; }
 
-        /* Login UI - Creative Style */
-        .login-box {
-            background: var(--card-bg);
-            padding: 60px 40px;
-            border-radius: 50px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            margin-top: 8vh;
-            border: 8px solid #fff;
-        }
-        .icon-circle {
-            width: 100px; height: 100px; background: #f0edff; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3.5rem; margin: 0 auto 20px;
-        }
+        /* Login UI */
+        .login-box { background: var(--card-bg); padding: 60px 40px; border-radius: 50px; text-align: center; box-shadow: var(--shadow); margin-top: 8vh; border: 8px solid #fff; }
+        .btn-google { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 16px 40px; border-radius: 50px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3); }
 
-        .btn-google {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; border: none; padding: 16px 40px; border-radius: 50px;
-            font-size: 1.1rem; font-weight: 500; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3); transition: 0.3s;
-        }
-        .btn-google:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(108, 92, 231, 0.4); }
-
-        /* Header & Panels */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; background: white; padding: 15px 25px;
-            border-radius: 25px; box-shadow: var(--shadow);
-        }
-        .admin-panel {
-            background: var(--card-bg); padding: 30px; border-radius: 35px;
-            margin-bottom: 30px; box-shadow: var(--shadow);
-        }
-        .label { font-size: 0.9rem; color: var(--primary); font-weight: 500; margin-bottom: 12px; display: block; }
+        /* Main UI Components */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 20px; box-shadow: var(--shadow); }
+        .admin-panel { background: var(--card-bg); padding: 25px; border-radius: 30px; margin-bottom: 20px; box-shadow: var(--shadow); border: 3px solid #fff; }
+        .label { font-size: 0.85rem; color: var(--primary); font-weight: 500; margin-bottom: 8px; display: block; }
         
-        input, select {
-            flex: 1; padding: 14px 20px; border-radius: 18px; border: 2px solid #eee;
-            background: #fdfdfd; color: var(--text-main); min-width: 200px; outline: none;
-        }
-        .btn-add {
-            background: var(--primary); color: white; border: none; padding: 12px 25px;
-            border-radius: 18px; font-weight: 500; cursor: pointer; transition: 0.3s;
-        }
-        .btn-cat { background: var(--accent); }
+        .input-group { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        input, select { flex: 1; padding: 12px 18px; border-radius: 15px; border: 2px solid #eee; background: #fdfdfd; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--secondary); }
 
-        /* Filter Area */
-        .filter-area { text-align: center; margin-bottom: 30px; }
-        #viewFilter {
-            width: 100%; max-width: 450px; background: white;
-            border-radius: 25px; border: 2px solid #fff; box-shadow: var(--shadow);
-        }
+        button { padding: 12px 20px; border-radius: 15px; border: none; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-accent { background: var(--accent); color: white; }
 
+        /* --- Search Section --- */
+        .search-section { background: #f0edff; padding: 25px; border-radius: 30px; margin-bottom: 20px; }
+        .search-results { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; scrollbar-width: thin; }
+        .result-card { min-width: 220px; width: 220px; background: white; padding: 12px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .result-card:hover { transform: scale(1.02); }
+        .result-card img { width: 100%; border-radius: 15px; margin-bottom: 10px; }
+        .result-title { font-size: 0.8rem; height: 40px; overflow: hidden; margin-bottom: 10px; line-height: 1.3; color: #444; }
+        
         /* Video Grid */
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .video-card {
-            background: white; padding: 15px; border-radius: 25px;
-            box-shadow: var(--shadow); position: relative; transition: 0.3s;
-        }
+        .video-card { background: white; padding: 15px; border-radius: 25px; box-shadow: var(--shadow); position: relative; transition: 0.3s; }
         .video-card:hover { transform: translateY(-10px); }
-        .iframe-wrap { position: relative; padding-top: 56.25%; border-radius: 15px; overflow: hidden; }
+        .iframe-wrap { position: relative; padding-top: 56.25%; border-radius: 18px; overflow: hidden; }
         .iframe-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .card-actions { display: flex; justify-content: space-around; padding-top: 15px; }
+        .tool-btn { background: none; border: none; font-size: 0.9rem; cursor: pointer; font-weight: 500; }
 
-        .card-actions { display: flex; justify-content: center; gap: 15px; padding-top: 15px; }
-        .tool-btn { background: #f8f9fe; border: none; padding: 8px 15px; border-radius: 12px; cursor: pointer; color: #666; transition: 0.2s; }
-        .tool-btn:hover { background: var(--primary); color: white; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 15vh auto; padding: 35px; border-radius: 35px; width: 90%; max-width: 400px; text-align: center; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
-        .modal-content { background: white; margin: 15vh auto; padding: 35px; border-radius: 35px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
-
-        @media (max-width: 600px) { .input-group { flex-direction: column; } }
         #mainApp, .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- หน้าแรก: Creative Inspiring Style -->
+    <!-- หน้า Login -->
     <div id="loginPage" class="login-box">
-        <div class="icon-circle">✨</div>
-        <h1 style="color: var(--primary); margin-bottom: 10px; font-size: 2.5rem;">Knowledge Collector</h1>
-        <p style="color: #636e72; font-size: 1.1rem; line-height: 1.6; margin-bottom: 40px;">
+        <div style="font-size: 4rem; margin-bottom: 15px;">✨</div>
+        <h1 style="color: var(--primary); margin: 0; font-size: 2.5rem;">Knowledge Collector</h1>
+        <p style="margin-bottom: 40px; color: #636e72; font-size: 1.1rem;">
             คัดสรรวิดีโอจากทั่วโลก มาเป็นคลังความรู้ส่วนตัวของคุณ <br> 
             จัดระเบียบทุกการเรียนรู้ ให้เติบโตได้ในที่เดียว
         </p>
-        <button class="btn-google" onclick="login()">🚀 เข้าสู่คลังความรู้ของฉัน</button>
+        <button class="btn-google" onclick="login()">🚀 เข้าสู่พื้นที่การเรียนรู้</button>
     </div>
 
-    <!-- หน้าหลักหลัง Login -->
+    <!-- หน้าแอปหลัก -->
     <div id="mainApp">
         <div class="header">
-            <div class="user-info">
-                <img id="userImg" src="">
-                <span id="userName" style="font-weight: 500;">Workspace ของฉัน</span>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <img id="userImg" src="" style="width:40px; border-radius:50%; border: 2px solid var(--accent);">
+                <span id="userName" style="font-weight:500;">Workspace ของฉัน</span>
             </div>
-            <button onclick="auth.signOut()" style="background:none; border:none; color:#b2bec3; cursor:pointer;">ลงชื่อออก</button>
+            <button onclick="auth.signOut()" style="background:none; color:#b2bec3; border:none; cursor:pointer;">ลงชื่อออก</button>
+        </div>
+
+        <!-- ระบบค้นหา Smart Search -->
+        <div class="search-section">
+            <span class="label">🔍 ค้นหาความรู้ใหม่จาก YouTube</span>
+            <div class="input-group">
+                <input type="text" id="searchQuery" placeholder="พิมพ์สิ่งที่คุณอยากเรียนรู้...">
+                <button class="btn-accent" onclick="searchYouTube()">ค้นหาความรู้</button>
+            </div>
+            <div id="searchResults" class="search-results">
+                <p style="color:#b2bec3; font-size:0.9rem; padding: 20px;">พิมพ์คำค้นหาเพื่อเริ่มดึงข้อมูลจาก YouTube...</p>
+            </div>
         </div>
 
         <div class="admin-panel">
-            <span class="label">📚 สร้างหมวดหมู่การเรียนรู้ใหม่</span>
-            <div class="input-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <select id="parentCatSelect"><option value="none">-- เป็นหมวดหมู่หลัก --</option></select>
+            <span class="label">📚 สร้างหมวดหมู่การเรียนรู้</span>
+            <div class="input-group">
+                <select id="parentCatSelect"><option value="none">-- เป็นหมวดหลัก --</option></select>
                 <input type="text" id="catInput" placeholder="เช่น วิทยาศาสตร์, ออกแบบ, ภาษา...">
-                <button class="btn-add btn-cat" onclick="addCategory()">สร้างหน่วยความรู้</button>
+                <button class="btn-primary" onclick="addCategory()">สร้างหน่วย</button>
             </div>
             
-            <span class="label">🔗 บันทึกเนื้อหาใหม่ (YouTube URL)</span>
-            <div class="input-group" style="display: flex; gap: 10px;">
+            <span class="label">🔗 บันทึกความรู้จากลิงก์ (URL)</span>
+            <div class="input-group">
                 <select id="targetCatSelect"><option value="">-- เลือกหมวดเก็บข้อมูล --</option></select>
-                <input type="text" id="videoUrl" placeholder="วางลิงก์วิดีโอที่นี่...">
-                <button class="btn-add" onclick="addVideo()">บันทึกความรู้</button>
+                <input type="text" id="videoUrl" placeholder="วางลิงก์วิดีโอ YouTube ที่นี่...">
+                <button class="btn-primary" onclick="addVideo()">บันทึกเข้าคลัง</button>
             </div>
         </div>
 
-        <div class="filter-area">
-            <select id="viewFilter" onchange="renderVideos()">
-                <option value="all">💎 เปิดคลังความรู้ทั้งหมด</option>
+        <div style="margin-bottom: 25px; text-align: center;">
+            <span class="label">เปิดดูคลังความรู้หมวด:</span>
+            <select id="viewFilter" onchange="renderVideos()" style="width:100%; max-width: 500px; border-radius:25px; font-weight:bold; color:var(--primary); text-align-last: center; box-shadow: var(--shadow);">
+                <option value="all">💎 คลังความรู้ทั้งหมด</option>
             </select>
         </div>
 
@@ -153,14 +127,16 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h2 style="color: var(--primary); margin-bottom: 20px;">ย้ายหมวดหมู่ความรู้ 💡</h2>
-        <select id="editCatSelect" style="width: 100%; margin-bottom: 20px;"></select>
-        <button class="btn-add" style="width: 100%; margin-bottom: 10px;" onclick="saveEdit()">บันทึกการเปลี่ยนแปลง</button>
-        <button class="tool-btn" style="width: 100%;" onclick="closeModal()">ยกเลิก</button>
+        <select id="editCatSelect" style="width:100%; margin-bottom:25px;"></select>
+        <button class="btn-primary" style="width:100%; margin-bottom:12px;" onclick="saveEdit()">บันทึกการเปลี่ยนแปลง</button>
+        <button onclick="closeModal()" style="width:100%; background:#f1f2f6; border:none; padding:12px; border-radius:15px; cursor:pointer;">ยกเลิก</button>
     </div>
 </div>
 
 <script>
-    // Config เดิมของคุณ
+    // --- 1. CONFIGURATION ---
+    const YT_API_KEY = "AIzaSyBVsxZxnjoMEE6uCk3qaAoenOLEdbgg3U4"; // คีย์ที่คุณให้มา
+
     const firebaseConfig = {
         apiKey: "AIzaSyDWr7Ev6aPzwNPTfuRYp46Pb_a-uJboiXg",
         authDomain: "video-playlist-40cf0.firebaseapp.com",
@@ -179,6 +155,7 @@
     let myData = { categories: {}, videos: {} };
     let editingVideoKey = null;
 
+    // --- 2. AUTHENTICATION ---
     function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
     auth.onAuthStateChanged(user => {
@@ -199,6 +176,55 @@
         }
     });
 
+    // --- 3. YOUTUBE SEARCH ENGINE ---
+    async function searchYouTube() {
+        const query = document.getElementById('searchQuery').value.trim();
+        if (!query) return alert("กรุณาใส่คำค้นหา");
+        
+        const resultsArea = document.getElementById('searchResults');
+        resultsArea.innerHTML = "<p style='padding:20px; color:var(--primary);'>✨ กำลังดึงความรู้จาก YouTube...</p>";
+
+        try {
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${YT_API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.error) throw new Error(data.error.message);
+
+            resultsArea.innerHTML = "";
+            if (data.items.length === 0) {
+                resultsArea.innerHTML = "<p style='padding:20px;'>ไม่พบวิดีโอที่ค้นหา</p>";
+                return;
+            }
+
+            data.items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <img src="${item.snippet.thumbnails.medium.url}">
+                    <div class="result-title">${item.snippet.title}</div>
+                    <button class="btn-primary" style="width:100%; padding:8px; font-size:0.75rem;" onclick="quickSave('${item.id.videoId}')">บันทึกเข้าคลัง</button>
+                `;
+                resultsArea.appendChild(card);
+            });
+        } catch (err) {
+            alert("Error: " + err.message);
+            resultsArea.innerHTML = "<p style='color:red; padding:20px;'>เกิดข้อผิดพลาดในการเชื่อมต่อ YouTube</p>";
+        }
+    }
+
+    function quickSave(videoId) {
+        const catId = document.getElementById('targetCatSelect').value;
+        if (!catId) return alert("กรุณาเลือก 'หมวดเก็บข้อมูล' ในส่วนที่ 2 ก่อนกดบันทึกครับ");
+        
+        db.ref('users/' + currentUser.uid + '/videos').push().set({
+            catId: catId,
+            youtubeId: videoId,
+            addedAt: Date.now()
+        }).then(() => alert("บันทึกความรู้เข้าคลังเรียบร้อยแล้ว ✨"));
+    }
+
+    // --- 4. DATA MANAGEMENT ---
     function addCategory() {
         const name = document.getElementById('catInput').value.trim();
         const parentId = document.getElementById('parentCatSelect').value;
@@ -214,11 +240,9 @@
         const catId = document.getElementById('targetCatSelect').value;
         const url = document.getElementById('videoUrl').value.trim();
         const vid = extractID(url);
-        if (!catId || !vid) return alert("กรุณาเลือกหมวดและใส่ลิงก์ด้วยครับ");
+        if (!catId || !vid) return alert("ข้อมูลไม่ครบถ้วน");
         db.ref('users/' + currentUser.uid + '/videos').push().set({
-            catId: catId,
-            youtubeId: vid,
-            addedAt: Date.now()
+            catId: catId, youtubeId: vid, addedAt: Date.now()
         });
         document.getElementById('videoUrl').value = '';
     }
@@ -237,21 +261,16 @@
         document.getElementById('editModal').style.display = 'block';
     }
 
-    function closeModal() {
-        document.getElementById('editModal').style.display = 'none';
-        editingVideoKey = null;
-    }
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; editingVideoKey = null; }
 
     function saveEdit() {
         const newCatId = document.getElementById('editCatSelect').value;
         if (!newCatId || !editingVideoKey) return;
-        db.ref('users/' + currentUser.uid + '/videos/' + editingVideoKey).update({
-            catId: newCatId
-        }).then(() => closeModal());
+        db.ref('users/' + currentUser.uid + '/videos/' + editingVideoKey).update({ catId: newCatId }).then(() => closeModal());
     }
 
     function deleteVideo(key) {
-        if(confirm('ลบข้อมูลความรู้นี้หรือไม่?')) db.ref('users/' + currentUser.uid + '/videos/' + key).remove();
+        if(confirm('ลบความรู้นี้จากคลังหรือไม่?')) db.ref('users/' + currentUser.uid + '/videos/' + key).remove();
     }
 
     function updateDropdowns() {
@@ -259,23 +278,15 @@
         const tSel = document.getElementById('targetCatSelect');
         const fSel = document.getElementById('viewFilter');
         const currentFilter = fSel.value;
-
         const cats = myData.categories || {};
-        const mainCats = [];
-        const subCats = {};
-
+        const mainCats = []; const subCats = {};
         for (let id in cats) {
             if (!cats[id].parentId) mainCats.push({ id, ...cats[id] });
-            else {
-                if (!subCats[cats[id].parentId]) subCats[cats[id].parentId] = [];
-                subCats[cats[id].parentId].push({ id, ...cats[id] });
-            }
+            else { if (!subCats[cats[id].parentId]) subCats[cats[id].parentId] = []; subCats[cats[id].parentId].push({ id, ...cats[id] }); }
         }
-
-        let pHTML = '<option value="none">-- เป็นหมวดหมู่หลักใหม่ --</option>';
-        let tHTML = '<option value="">-- เลือกหน่วยความรู้ --</option>';
-        let fHTML = '<option value="all">💎 เปิดคลังความรู้ทั้งหมด</option>';
-
+        let tHTML = '<option value="">-- เลือกหมวดเก็บข้อมูล --</option>';
+        let fHTML = '<option value="all">💎 คลังความรู้ทั้งหมด</option>';
+        let pHTML = '<option value="none">-- เป็นหมวดหลัก --</option>';
         mainCats.forEach(main => {
             pHTML += `<option value="${main.id}">${main.name}</option>`;
             tHTML += `<option value="${main.id}" style="font-weight:bold;">${main.name}</option>`;
@@ -287,49 +298,31 @@
                 });
             }
         });
-
-        pSel.innerHTML = pHTML; tSel.innerHTML = tHTML; fSel.innerHTML = fHTML;
-        fSel.value = currentFilter;
+        pSel.innerHTML = pHTML; tSel.innerHTML = tHTML; fSel.innerHTML = fHTML; fSel.value = currentFilter;
     }
 
     function renderVideos() {
         const display = document.getElementById('videoDisplay');
         const filterVal = document.getElementById('viewFilter').value;
         display.innerHTML = '';
-
         const videos = myData.videos || {};
         const cats = myData.categories || {};
-        
         let allowedCatIds = [filterVal];
-        if (filterVal !== 'all') {
-            for (let id in cats) {
-                if (cats[id].parentId === filterVal) allowedCatIds.push(id);
-            }
-        }
-
+        if (filterVal !== 'all') { for (let id in cats) { if (cats[id].parentId === filterVal) allowedCatIds.push(id); } }
         const keys = Object.keys(videos).sort((a, b) => (videos[b].addedAt || 0) - (videos[a].addedAt || 0));
-
         keys.forEach(key => {
             const v = videos[key];
             if (filterVal !== 'all' && !allowedCatIds.includes(v.catId)) return;
-
             const card = document.createElement('div');
             card.className = 'video-card';
-            card.innerHTML = `
-                <div class="iframe-wrap">
-                    <iframe src="https://www.youtube.com/embed/${v.youtubeId}" allowfullscreen></iframe>
-                </div>
+            card.innerHTML = `<div class="iframe-wrap"><iframe src="https://www.youtube.com/embed/${v.youtubeId}" allowfullscreen></iframe></div>
                 <div class="card-actions">
-                    <button class="tool-btn" onclick="openEditModal('${key}', '${v.catId}')">ย้ายหมวด</button>
-                    <button class="tool-btn" style="color:#ff7675" onclick="deleteVideo('${key}')">ลบ</button>
-                </div>
-            `;
+                    <button class="tool-btn" onclick="openEditModal('${key}', '${v.catId}')" style="color:var(--primary);">✎ ย้ายหมวด</button>
+                    <button class="tool-btn" onclick="deleteVideo('${key}')" style="color:#ff7675;">✖ ลบความรู้</button>
+                </div>`;
             display.appendChild(card);
         });
-
-        if (display.innerHTML === '') {
-            display.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #b2bec3; padding: 40px;">คลังความรู้นี้ยังว่างเปล่า เริ่มบันทึกกันเลย ✨</p>';
-        }
+        if (display.innerHTML === '') display.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #b2bec3; padding: 40px;">คลังความรู้นี้ยังว่างเปล่า เริ่มต้นการเรียนรู้กันเลย ✨</p>';
     }
 </script>
 </body>
