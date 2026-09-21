@@ -29,18 +29,19 @@
         .user-info { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
         .user-info img { width: 32px; height: 32px; border-radius: 50%; }
 
-        /* Search Results */
+        /* Search Area */
         .search-section { background: #eeebff; padding: 15px; border-radius: 20px; margin-bottom: 15px; box-shadow: var(--shadow); }
-        .search-results { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; }
+        .search-results { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; }
+        .search-results::-webkit-scrollbar { display: none; }
         .result-card { min-width: 160px; width: 160px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .result-card img { width: 100%; border-radius: 10px; }
-        .result-title { font-size: 0.7rem; height: 32px; overflow: hidden; margin: 5px 0; line-height: 1.2; }
+        .result-title { font-size: 0.7rem; height: 32px; overflow: hidden; margin: 5px 0; line-height: 1.2; color: #555; }
 
-        /* Video Grid & Cards */
+        /* Video Display */
         .video-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .video-card { background: white; border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+        .video-card { background: white; border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
+        .video-card:hover { transform: translateY(-5px); }
         
-        /* New Video Title Tab */
         .video-title-tab {
             padding: 10px 15px;
             background: #f8f9fe;
@@ -59,16 +60,17 @@
         .card-actions { display: flex; justify-content: space-around; padding: 12px; background: #fff; }
         .tool-btn { background: #f0f2f5; border: none; padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; cursor: pointer; }
 
-        /* General UI */
+        /* Admin Controls */
         .admin-panel { background: var(--card-bg); padding: 15px; border-radius: 20px; margin-bottom: 15px; box-shadow: var(--shadow); }
-        .input-group { display: flex; flex-direction: column; gap: 10px; }
-        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: white; padding: 12px; border-radius: 12px; border: none; font-weight: 500; }
-        .btn-accent { background: var(--accent); color: white; padding: 12px; border-radius: 12px; border: none; font-weight: 500; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--secondary); }
+        .btn-primary { background: var(--primary); color: white; padding: 12px; border-radius: 12px; border: none; font-weight: 500; cursor: pointer; }
+        .btn-accent { background: var(--accent); color: white; padding: 12px; border-radius: 12px; border: none; font-weight: 500; cursor: pointer; }
 
         /* Modals */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal-content { background: white; padding: 25px; border-radius: 25px; width: 100%; max-width: 350px; text-align: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 25px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 
         @media (min-width: 600px) {
             .input-group { flex-direction: row; }
@@ -79,40 +81,42 @@
 <body>
 
 <div class="container">
-    <!-- Login -->
+    <!-- Login Page -->
     <div id="loginPage" class="login-box">
         <div style="font-size: 3rem; margin-bottom: 10px;">✨</div>
         <h2 style="color: var(--primary); margin: 0;">Knowledge Collector</h2>
-        <p style="margin-bottom: 30px; color: #7f8c8d;">คัดสรรวิดีโอความรู้ส่วนตัวของคุณ</p>
+        <p style="margin-bottom: 30px; color: #7f8c8d;">บันทึกวิดีโอความรู้ส่วนตัวของคุณ</p>
         <button class="btn-google" onclick="login()">🚀 เข้าสู่ระบบด้วย Google</button>
     </div>
 
-    <!-- Main App -->
+    <!-- Main App Content -->
     <div id="mainApp" style="display:none;">
         <div class="header">
             <div class="user-info"><img id="userImg" src=""> <b id="userName"></b></div>
             <button onclick="auth.signOut()" style="background:none; border:none; color:#95a5a6; font-size:0.8rem;">Logout</button>
         </div>
 
+        <!-- Section: ค้นหา -->
         <div class="search-section">
             <span style="font-size:0.8rem; color:var(--primary); font-weight:500;">🔍 ค้นหาและบันทึกความรู้ใหม่</span>
-            <div class="input-group" style="margin-top:8px;">
-                <input type="text" id="searchQuery" placeholder="ค้นหาวิดีโอที่สนใจ...">
+            <div class="input-group">
+                <input type="text" id="searchQuery" placeholder="พิมพ์สิ่งที่คุณอยากเรียนรู้...">
                 <button class="btn-accent" onclick="searchYouTube()">ค้นหา</button>
             </div>
             <div id="searchResults" class="search-results">
-                <p style="color:#bdc3c7; font-size:0.8rem; padding:10px;">พิมพ์คำค้นหาเพื่อเริ่ม...</p>
+                <p style="color:#bdc3c7; font-size:0.8rem; padding:10px;">ผลการค้นหาจะขึ้นที่นี่...</p>
             </div>
         </div>
 
+        <!-- Section: จัดการหมวดหมู่และลิงก์ -->
         <div class="admin-panel">
-            <span style="font-size:0.8rem; color:var(--primary); font-weight:500;">📚 จัดการคลังและบันทึกจาก URL</span>
-            <div class="input-group" style="margin-top:8px;">
+            <span style="font-size:0.8rem; color:var(--primary); font-weight:500;">📚 จัดการคลังข้อมูล</span>
+            <div class="input-group">
                 <select id="parentCatSelect"><option value="none">-- เป็นหมวดหลัก --</option></select>
-                <input type="text" id="catInput" placeholder="สร้างหมวดหมู่ใหม่...">
-                <button class="btn-primary" onclick="addCategory()">สร้าง</button>
+                <input type="text" id="catInput" placeholder="ชื่อหมวดหมู่ใหม่...">
+                <button class="btn-primary" onclick="addCategory()">+ สร้าง</button>
             </div>
-            <div class="input-group" style="margin-top:10px;">
+            <div class="input-group" style="margin-top:15px; border-top:1px solid #eee; pt:15px;">
                 <input type="text" id="videoUrl" placeholder="วางลิงก์ YouTube ที่นี่...">
                 <button class="btn-primary" onclick="addVideoByUrl()">บันทึกจากลิงก์</button>
             </div>
@@ -128,37 +132,38 @@
     </div>
 </div>
 
-<!-- Modal บันทึก -->
+<!-- Modal: บันทึก -->
 <div id="saveModal" class="modal">
     <div class="modal-content">
-        <h3 id="modalTitleText" style="color:var(--primary); font-size:1rem; margin-bottom:15px;">บันทึกลงคลัง ✨</h3>
+        <h3 id="modalTitleText" style="color:var(--primary); font-size:0.9rem; margin-bottom:20px; line-height:1.4;">บันทึกลงคลัง ✨</h3>
         <select id="modalCatSelect" style="margin-bottom: 20px;"></select>
         <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="executeQuickSave()">ตกลง</button>
         <button onclick="closeModal('saveModal')" style="width: 100%; background: #eee; border-radius: 12px; padding:10px; border:none;">ยกเลิก</button>
     </div>
 </div>
 
-<!-- Modal ย้ายหมวด -->
+<!-- Modal: ย้าย/แก้ไข -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); margin: 0 0 15px;">ย้ายหมวดหมู่ 💡</h3>
-        <select id="editCatSelect" style="margin-bottom: 20px;"></select>
+        <h3 style="color: var(--primary); margin: 0 0 20px;">ย้ายหมวดหมู่ 💡</h3>
+        <select id="editCatSelect" style="margin-bottom: 25px;"></select>
         <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="saveEdit()">บันทึก</button>
         <button onclick="closeModal('editModal')" style="width: 100%; background: #eee; border-radius: 12px; padding:10px; border:none;">ยกเลิก</button>
     </div>
 </div>
 
-<!-- Modal ลบ -->
+<!-- Modal: ยืนยันการลบ -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <h3 style="color: #ff7675; margin-bottom: 15px;">ยืนยันการลบ? 🗑️</h3>
-        <p style="font-size:0.85rem; color:#7f8c8d; margin-bottom:20px;">วิดีโอนี้จะถูกลบออกจากคลังของคุณ</p>
-        <button id="confirmDeleteBtn" style="width: 100%; background:#ff7675; color:white; margin-bottom:10px;">ลบเลย</button>
+        <p style="font-size:0.85rem; color:#7f8c8d; margin-bottom:25px;">วิดีโอนี้จะถูกลบออกจากคลังของคุณ</p>
+        <button id="confirmDeleteBtn" style="width: 100%; background:#ff7675; color:white; margin-bottom:10px; padding:12px; border:none; border-radius:12px; font-weight:bold;">ลบเลย</button>
         <button onclick="closeModal('deleteModal')" style="width: 100%; background: #eee; border-radius: 12px; padding:10px; border:none;">ยกเลิก</button>
     </div>
 </div>
 
 <script>
+    // --- ตั้งค่า YouTube API และ Firebase ---
     const YT_API_KEY = "AIzaSyBVsxZxnjoMEE6uCk3qaAoenOLEdbgg3U4";
     const firebaseConfig = {
         apiKey: "AIzaSyDWr7Ev6aPzwNPTfuRYp46Pb_a-uJboiXg",
@@ -200,30 +205,33 @@
         }
     });
 
+    // --- ระบบค้นหาวิดีโอ ---
     async function searchYouTube() {
         const query = document.getElementById('searchQuery').value.trim();
         if (!query) return;
         const resultsArea = document.getElementById('searchResults');
-        resultsArea.innerHTML = "ค้นหา...";
+        resultsArea.innerHTML = "<p style='padding:10px;'>🔍 กำลังค้นหา...</p>";
         try {
             const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&type=video&key=${YT_API_KEY}`);
             const data = await res.json();
             resultsArea.innerHTML = "";
-            data.items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.innerHTML = `
-                    <img src="${item.snippet.thumbnails.medium.url}">
-                    <div class="result-title">${item.snippet.title}</div>
-                    <button class="btn-primary" style="width:100%; padding:5px; font-size:0.7rem;" 
-                        onclick="openSaveModal('${item.id.videoId}', '${item.snippet.title.replace(/'/g, "\\'")}')">บันทึก</button>
-                `;
-                resultsArea.appendChild(card);
-            });
+            if (data.items) {
+                data.items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.innerHTML = `
+                        <img src="${item.snippet.thumbnails.medium.url}">
+                        <div class="result-title">${item.snippet.title}</div>
+                        <button class="btn-primary" style="width:100%; padding:5px; font-size:0.7rem;" 
+                            onclick="openSaveModal('${item.id.videoId}', '${item.snippet.title.replace(/'/g, "\\'")}')">บันทึก</button>
+                    `;
+                    resultsArea.appendChild(card);
+                });
+            }
         } catch (err) { resultsArea.innerHTML = "Error"; }
     }
 
-    // บันทึกจาก URL โดยดึงชื่อคลิปก่อน
+    // --- บันทึกจาก URL ---
     async function addVideoByUrl() {
         const urlInput = document.getElementById('videoUrl');
         const vid = extractID(urlInput.value);
@@ -232,10 +240,10 @@
         try {
             const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${vid}&key=${YT_API_KEY}`);
             const data = await res.json();
-            if (data.items.length > 0) {
+            if (data.items && data.items.length > 0) {
                 openSaveModal(vid, data.items[0].snippet.title);
                 urlInput.value = "";
-            } else { alert("ไม่พบวิดีโอ"); }
+            } else { alert("ไม่พบวิดีโอ หรือ API มีปัญหา"); }
         } catch (e) { alert("ดึงข้อมูลวิดีโอผิดพลาด"); }
     }
 
@@ -256,19 +264,29 @@
         const catId = document.getElementById('modalCatSelect').value;
         if (!catId) return alert("โปรดเลือกหมวดหมู่");
         db.ref('users/' + currentUser.uid + '/videos').push().set({
-            catId: catId, youtubeId: pendingVideoData.id, title: pendingVideoData.title, addedAt: Date.now()
+            catId: catId, 
+            youtubeId: pendingVideoData.id, 
+            title: pendingVideoData.title, 
+            addedAt: Date.now()
         }).then(() => closeModal('saveModal'));
     }
 
+    // --- ระบบลบวิดีโอ ---
     function openDeleteModal(key) {
         deletingVideoKey = key;
         document.getElementById('deleteModal').style.display = 'flex';
     }
 
     document.getElementById('confirmDeleteBtn').onclick = function() {
-        db.ref('users/' + currentUser.uid + '/videos/' + deletingVideoKey).remove().then(() => closeModal('deleteModal'));
+        if (deletingVideoKey) {
+            db.ref('users/' + currentUser.uid + '/videos/' + deletingVideoKey).remove().then(() => {
+                closeModal('deleteModal');
+                deletingVideoKey = null;
+            });
+        }
     };
 
+    // --- ระบบหมวดหมู่ ---
     function addCategory() {
         const name = document.getElementById('catInput').value.trim();
         const parentId = document.getElementById('parentCatSelect').value;
@@ -281,18 +299,37 @@
 
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function openEditModal(key, currentCatId) {
+    // --- ระบบแก้ไข/ย้ายหมวดหมู่ ---
+    function openEditModal(key, currentCatId, videoId) {
         editingVideoKey = key;
+        editingVideoId = videoId; // เก็บ Video ID ไว้เผื่อดึงชื่อใหม่
         document.getElementById('editCatSelect').innerHTML = generateCategoryOptions();
         document.getElementById('editCatSelect').value = currentCatId;
         document.getElementById('editModal').style.display = 'flex';
     }
 
-    function saveEdit() {
+    async function saveEdit() {
         const newCatId = document.getElementById('editCatSelect').value;
-        db.ref('users/' + currentUser.uid + '/videos/' + editingVideoKey).update({ catId: newCatId }).then(() => closeModal('editModal'));
+        const videoRef = db.ref('users/' + currentUser.uid + '/videos/' + editingVideoKey);
+        
+        // เมื่อกดเซฟในวิดีโอที่ไม่มีชื่อ ระบบจะพยายามดึงชื่อใหม่มาใส่ให้ด้วย
+        let updateData = { catId: newCatId };
+        
+        const currentVideo = myData.videos[editingVideoKey];
+        if (!currentVideo.title && currentVideo.youtubeId) {
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${currentVideo.youtubeId}&key=${YT_API_KEY}`);
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    updateData.title = data.items[0].snippet.title;
+                }
+            } catch(e) {}
+        }
+
+        videoRef.update(updateData).then(() => closeModal('editModal'));
     }
 
+    // --- Helper Functions ---
     function generateCategoryOptions() {
         const cats = myData.categories || {};
         const mainCats = []; const subCats = {};
@@ -330,20 +367,30 @@
         let allowedIds = [filterVal];
         if (filterVal !== 'all') for (let id in cats) if (cats[id].parentId === filterVal) allowedIds.push(id);
 
-        Object.keys(videos).sort((a,b)=>videos[b].addedAt - videos[a].addedAt).forEach(key => {
+        const keys = Object.keys(videos).sort((a,b)=>(videos[b].addedAt || 0) - (videos[a].addedAt || 0));
+        
+        keys.forEach(key => {
             const v = videos[key];
             if (filterVal !== 'all' && !allowedIds.includes(v.catId)) return;
+            
             const card = document.createElement('div');
             card.className = 'video-card';
+            
+            // ชื่อวิดีโอ (ถ้าไม่มีให้แสดงข้อความสำรอง)
+            const videoTitle = v.title || "📌 คลิกแก้ไขเพื่อดึงชื่อวิดีโอ";
+            
             card.innerHTML = `
-                <div class="video-title-tab" title="${v.title || ''}">${v.title || 'ไม่มีชื่อวิดีโอ'}</div>
-                <div class="iframe-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${v.youtubeId}?modestbranding=1&rel=0" allowfullscreen></iframe></div>
+                <div class="video-title-tab" title="${videoTitle}">${videoTitle}</div>
+                <div class="iframe-wrap">
+                    <iframe src="https://www.youtube-nocookie.com/embed/${v.youtubeId}?modestbranding=1&rel=0&iv_load_policy=3" allowfullscreen></iframe>
+                </div>
                 <div class="card-actions">
-                    <button class="tool-btn" onclick="openEditModal('${key}', '${v.catId}')" style="color:var(--primary);">✎ ย้าย</button>
+                    <button class="tool-btn" onclick="openEditModal('${key}', '${v.catId}', '${v.youtubeId}')" style="color:var(--primary);">✎ ย้าย/อัปเดต</button>
                     <button class="tool-btn" onclick="openDeleteModal('${key}')" style="color:#ff7675;">✖ ลบ</button>
                 </div>`;
             display.appendChild(card);
         });
+        if (display.innerHTML === '') display.innerHTML = '<p style="text-align:center; color:#bdc3c7; padding:40px;">ไม่มีวิดีโอในหมวดหมู่นี้ ✨</p>';
     }
 </script>
 </body>
